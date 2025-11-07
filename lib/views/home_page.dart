@@ -7,13 +7,18 @@ import '../widgets/custom_button.dart';
 import '../widgets/states.dart' as ui_states;
 import '../widgets/todo_item.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final TodoController controller = Get.put(TodoController());
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
+  final TodoController controller = Get.put(TodoController());
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
@@ -31,104 +36,59 @@ class HomePage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Add Todo Section
           Container(
             color: Colors.white,
             child: Padding(
               padding: const EdgeInsets.all(16),
-              child: Column(
+              child: Row(
                 children: [
-                  // Add todo form
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: controller.addTodoController,
-                          decoration: InputDecoration(
-                            hintText: 'Enter a new todo...',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide:
-                                  BorderSide(color: Colors.grey.shade300),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide:
-                                  BorderSide(color: Colors.grey.shade300),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                  color: Theme.of(context).primaryColor),
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey.shade50,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                          ),
-                          onChanged: (value) {
-                            // Update search as user types
-                            controller.searchController.text = value;
-                          },
-                          onSubmitted: (value) => controller.addTodo(),
+                  Expanded(
+                    child: TextField(
+                      controller: controller.addTodoController,
+                      decoration: InputDecoration(
+                        hintText: 'Enter a new todo...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              BorderSide(color: Colors.grey.shade300),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              BorderSide(color: Colors.grey.shade300),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                              color: Theme.of(context).primaryColor),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Obx(() => PrimaryButton(
-                            label:
-                                controller.isAddingTodo ? 'Adding...' : 'Add',
-                            onPressed: controller.addTodo,
-                            isLoading: controller.isAddingTodo,
-                            icon: Icons.add,
-                          )),
-                    ],
+                      onChanged: (value) {
+                        // Update search as user types
+                        controller.searchController.text = value;
+                      },
+                      onSubmitted: (value) => controller.addTodo(),
+                    ),
                   ),
-
-                  const SizedBox(height: 16),
-
-                  // Search field
-                  TextField(
-                    controller: controller.searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search todos...',
-                      prefixIcon: const Icon(Icons.search),
-                      suffixIcon: Obx(
-                        () => controller.searchQuery.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear),
-                                onPressed: controller.clearSearch,
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide:
-                            BorderSide(color: Theme.of(context).primaryColor),
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
+                  const SizedBox(width: 12),
+                  Obx(
+                    () => PrimaryButton(
+                      label: controller.isAddingTodo ? 'Adding...' : 'Add',
+                      onPressed: controller.addTodo,
+                      isLoading: controller.isAddingTodo,
+                      icon: Icons.add,
                     ),
                   ),
                 ],
               ),
             ),
           ),
-
-          // Todo List
           Expanded(
             child: Obx(() {
               final status = controller.status;
@@ -139,7 +99,8 @@ class HomePage extends StatelessWidget {
               // Loading state
               if (status == LoadingState.loading) {
                 return const ui_states.LoadingState(
-                    message: 'Loading todos...');
+                  message: 'Loading todos...',
+                );
               }
 
               // Error state
@@ -157,7 +118,6 @@ class HomePage extends StatelessWidget {
                   subtitle: 'Add your first todo above to get started!',
                   icon: Icons.checklist,
                   onActionPressed: () {
-                    // Focus on the add todo field
                     controller.addTodoController.text = '';
                     FocusScope.of(context).requestFocus(FocusNode());
                   },
@@ -177,7 +137,6 @@ class HomePage extends StatelessWidget {
                 );
               }
 
-              // Todo list
               return ListView.builder(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 itemCount: filteredTodos.length,
