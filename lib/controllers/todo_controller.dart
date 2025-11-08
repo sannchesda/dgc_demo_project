@@ -368,22 +368,38 @@ class TodoController extends GetxController {
   }
 
   void showSuccessSnackbar(String message) {
-    Get.snackbar(
-      'Success',
-      message,
-      backgroundColor: Colors.green.shade100,
-      colorText: Colors.green.shade900,
-      duration: const Duration(seconds: 2),
-    );
+    // Find the current context from the navigation
+    final context = Get.context;
+    if (context != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.green.shade600,
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+    }
   }
 
   void showErrorSnackbar(String message) {
-    Get.snackbar(
-      'Error',
-      message,
-      backgroundColor: Colors.red.shade100,
-      colorText: Colors.red.shade900,
-      duration: const Duration(seconds: 3),
-    );
+    // Find the current context from the navigation
+    final context = Get.context;
+    if (context != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red.shade600,
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+    }
   }
 }

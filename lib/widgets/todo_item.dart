@@ -18,15 +18,18 @@ class TodoItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<TodoController>();
-    
-    // Debug: Print the todo data to see what we're receiving
-    print('TodoItem received: id=${todo.id}, title="${todo.title}", description="${todo.description}"');
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _getBackgroundColor(),
         borderRadius: BorderRadius.circular(12),
+        border: Border(
+          left: BorderSide(
+            color: _getPriorityColor(),
+            width: 4,
+          ),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.1),
@@ -64,5 +67,41 @@ class TodoItem extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Returns background color based on todo priority and completion status
+  Color _getBackgroundColor() {
+    if (todo.isCompleted) {
+      return Colors.grey.shade100; // Muted color for completed todos
+    }
+
+    switch (todo.priority) {
+      case TodoPriority.high:
+        return Colors.red.shade50; // Light red for high priority
+      case TodoPriority.medium:
+        return Colors.orange.shade50; // Light orange for medium priority
+      case TodoPriority.low:
+        return Colors.green.shade50; // Light green for low priority
+      default:
+        return Colors.white;
+    }
+  }
+
+  /// Returns priority indicator color for the left border
+  Color _getPriorityColor() {
+    if (todo.isCompleted) {
+      return Colors.grey.shade400; // Muted color for completed todos
+    }
+
+    switch (todo.priority) {
+      case TodoPriority.high:
+        return Colors.red.shade400; // Red for high priority
+      case TodoPriority.medium:
+        return Colors.orange.shade400; // Orange for medium priority
+      case TodoPriority.low:
+        return Colors.green.shade400; // Green for low priority
+      default:
+        return Colors.grey.shade300;
+    }
   }
 }

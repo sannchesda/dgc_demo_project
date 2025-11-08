@@ -232,11 +232,15 @@ class _AddTodoPageState extends State<AddTodoPage> {
     final title = titleController.text.trim();
 
     if (title.isEmpty) {
-      Get.snackbar(
-        'Error',
-        'Please enter a todo title',
-        backgroundColor: Colors.red.shade100,
-        colorText: Colors.red.shade900,
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Please enter a todo title'),
+          backgroundColor: Colors.red.shade600,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
       );
       return;
     }
@@ -253,7 +257,23 @@ class _AddTodoPageState extends State<AddTodoPage> {
           updatedAt: DateTime.now(),
         );
         await controller.updateTodo(updatedTodo);
-        controller.showSuccessSnackbar('Todo updated successfully');
+        
+        // Show success message and navigate back to home
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Todo updated successfully'),
+              backgroundColor: Colors.green.shade600,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+          
+          // Navigate back to home page
+          Navigator.of(context).pop();
+        }
       } else {
         // Create new todo
         await controller.createTodo(
@@ -261,14 +281,37 @@ class _AddTodoPageState extends State<AddTodoPage> {
           descriptionController.text.trim(),
           selectedPriority.value,
         );
-        controller.showSuccessSnackbar('Todo created successfully');
+        
+        // Show success message and navigate back to home
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Todo created successfully'),
+              backgroundColor: Colors.green.shade600,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+          
+          // Navigate back to home page
+          Navigator.of(context).pop();
+        }
       }
-
-      Get.back();
     } catch (error) {
-      controller.showErrorSnackbar(
-        isEditing ? 'Failed to update todo' : 'Failed to create todo',
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(isEditing ? 'Failed to update todo' : 'Failed to create todo'),
+            backgroundColor: Colors.red.shade600,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      }
     } finally {
       isLoading.value = false;
     }
