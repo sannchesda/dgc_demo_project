@@ -166,7 +166,8 @@ class _HomePageState extends State<HomePage> {
                     child: Container(
                       height: MediaQuery.of(context).size.height * 0.6,
                       child: ui_states.ErrorState(
-                        message: 'Failed to load todos. Please try again.\nPull down to refresh.',
+                        message:
+                            'Failed to load todos. Please try again.\nPull down to refresh.',
                         onRetry: () => controller.refreshTodos(),
                       ),
                     ),
@@ -184,7 +185,8 @@ class _HomePageState extends State<HomePage> {
                       height: MediaQuery.of(context).size.height * 0.6,
                       child: ui_states.EmptyState(
                         title: 'No todos yet',
-                        subtitle: 'Add your first todo above to get started!\nPull down to refresh.',
+                        subtitle:
+                            'Add your first todo above to get started!\nPull down to refresh.',
                         icon: Icons.checklist,
                         onActionPressed: () {
                           controller.addTodoController.text = '';

@@ -174,7 +174,7 @@ class TodoController extends GetxController {
   Future<void> refreshTodos() async {
     try {
       loadingStatus.value = LoadingState.loading;
-      
+
       // Fetch fresh data from Firestore
       final snapshot = await firestore.collection('todos').get();
       final todos = snapshot.docs.where(

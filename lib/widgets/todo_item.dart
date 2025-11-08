@@ -69,7 +69,6 @@ class TodoItem extends StatelessWidget {
     );
   }
 
-  /// Returns background color based on todo priority and completion status
   Color _getBackgroundColor() {
     if (todo.isCompleted) {
       return Colors.grey.shade100; // Muted color for completed todos

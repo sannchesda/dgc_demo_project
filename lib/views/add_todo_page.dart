@@ -257,7 +257,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
           updatedAt: DateTime.now(),
         );
         await controller.updateTodo(updatedTodo);
-        
+
         // Show success message and navigate back to home
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -270,7 +270,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
               ),
             ),
           );
-          
+
           // Navigate back to home page
           Navigator.of(context).pop();
         }
@@ -281,7 +281,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
           descriptionController.text.trim(),
           selectedPriority.value,
         );
-        
+
         // Show success message and navigate back to home
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -294,7 +294,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
               ),
             ),
           );
-          
+
           // Navigate back to home page
           Navigator.of(context).pop();
         }
@@ -303,7 +303,8 @@ class _AddTodoPageState extends State<AddTodoPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(isEditing ? 'Failed to update todo' : 'Failed to create todo'),
+            content: Text(
+                isEditing ? 'Failed to update todo' : 'Failed to create todo'),
             backgroundColor: Colors.red.shade600,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
