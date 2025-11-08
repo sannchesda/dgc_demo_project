@@ -257,19 +257,19 @@ class _HomePageState extends State<HomePage> {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _StatItem(
+                  StatItem(
                     label: 'Total',
                     value: totalCount.toString(),
                     color: Colors.blue,
                     icon: Icons.list_alt,
                   ),
-                  _StatItem(
+                  StatItem(
                     label: 'Pending',
                     value: pendingCount.toString(),
                     color: Colors.orange,
                     icon: Icons.pending_actions,
                   ),
-                  _StatItem(
+                  StatItem(
                     label: 'Completed',
                     value: completedCount.toString(),
                     color: Colors.green,
@@ -285,13 +285,14 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class _StatItem extends StatelessWidget {
+class StatItem extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
   final IconData icon;
 
-  const _StatItem({
+  const StatItem({
+    super.key,
     required this.label,
     required this.value,
     required this.color,
@@ -303,31 +304,36 @@ class _StatItem extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: color..withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            icon,
-            color: color,
-            size: 20,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color..withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: 20,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
         ),
         Text(
           label,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 14,
             color: Colors.grey.shade600,
           ),
         ),

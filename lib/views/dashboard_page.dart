@@ -75,7 +75,7 @@ class DashboardPage extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _StatCard(
+                    child: StatCard(
                       title: 'Total Todos',
                       value: controller.totalTodos.toString(),
                       icon: Icons.list_alt,
@@ -84,7 +84,7 @@ class DashboardPage extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _StatCard(
+                    child: StatCard(
                       title: 'Completed',
                       value: controller.completedTodos.toString(),
                       icon: Icons.check_circle,
@@ -97,7 +97,7 @@ class DashboardPage extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _StatCard(
+                    child: StatCard(
                       title: 'Pending',
                       value: controller.pendingTodos.toString(),
                       icon: Icons.pending_actions,
@@ -106,7 +106,7 @@ class DashboardPage extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _StatCard(
+                    child: StatCard(
                       title: 'Completion Rate',
                       value:
                           '${controller.completionPercentage.toStringAsFixed(1)}%',
@@ -120,7 +120,7 @@ class DashboardPage extends StatelessWidget {
               const SizedBox(height: 24),
 
               // Completion Progress Chart
-              _ChartCard(
+              ChartCard(
                 title: 'Completion Progress',
                 child: SizedBox(
                   height: 200,
@@ -160,7 +160,7 @@ class DashboardPage extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Priority Distribution Chart
-              _ChartCard(
+              ChartCard(
                 title: 'Priority Distribution',
                 child: SizedBox(
                   height: 200,
@@ -234,7 +234,7 @@ class DashboardPage extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Weekly Completion Trend
-              _ChartCard(
+              ChartCard(
                 title: 'Weekly Completion Trend',
                 child: SizedBox(
                   height: 200,
@@ -333,13 +333,14 @@ class DashboardPage extends StatelessWidget {
   }
 }
 
-class _StatCard extends StatelessWidget {
+class StatCard extends StatelessWidget {
   final String title;
   final String value;
   final IconData icon;
   final Color color;
 
-  const _StatCard({
+  const StatCard({
+    super.key,
     required this.title,
     required this.value,
     required this.icon,
@@ -355,32 +356,15 @@ class _StatCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black..withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.2), // lighter shadow
+            blurRadius: 3, // smaller blur
+            offset: const Offset(0, 1), // smaller offset
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: color..withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 20,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
           Text(
             value,
             style: TextStyle(
@@ -403,11 +387,12 @@ class _StatCard extends StatelessWidget {
   }
 }
 
-class _ChartCard extends StatelessWidget {
+class ChartCard extends StatelessWidget {
   final String title;
   final Widget child;
 
-  const _ChartCard({
+  const ChartCard({
+    super.key,
     required this.title,
     required this.child,
   });
@@ -422,9 +407,9 @@ class _ChartCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black..withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.2), // lighter shadow
+            blurRadius: 3, // smaller blur
+            offset: const Offset(0, 1), // smaller offset
           ),
         ],
       ),
