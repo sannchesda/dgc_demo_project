@@ -6,103 +6,209 @@ import 'package:uuid/uuid.dart';
 import '../models/todo.dart';
 
 class TodoController extends GetxController {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final Uuid _uuid = const Uuid();
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final Uuid uuid = const Uuid();
 
   // Observable state variables
-  final RxList<Todo> _todos = <Todo>[].obs;
-  final RxString _searchQuery = ''.obs;
-  final Rx<LoadingState> _status = LoadingState.loading.obs;
-  final RxMap<String, bool> _loadingStates = <String, bool>{}.obs;
-  final RxBool _isAddingTodo = false.obs;
+  final RxList<Todo> todoList = <Todo>[].obs;
+  final RxString searchQuery = ''.obs;
+  final Rx<LoadingState> loadingStatus = LoadingState.loading.obs;
 
   // Text controllers
   final TextEditingController searchController = TextEditingController();
   final TextEditingController addTodoController = TextEditingController();
+  final TextEditingController addTodoDescriptionController =
+      TextEditingController();
 
-  // Getters
-  List<Todo> get todos => _todos;
-  String get searchQuery => _searchQuery.value;
-  LoadingState get status => _status.value;
-  bool get isAddingTodo => _isAddingTodo.value;
-
-  // Filtered todos based on search query
-  List<Todo> get filteredTodos {
-    if (_searchQuery.value.isEmpty) {
-      return _todos;
-    }
-    return _todos
-        .where((todo) =>
-            todo.todo.toLowerCase().contains(_searchQuery.value.toLowerCase()))
-        .toList();
-  }
-
-  // Loading state helpers
-  bool isLoading(String key) => _loadingStates[key] ?? false;
-  bool isDeleting(String todoId) => isLoading('deleting-$todoId');
-  bool isEditing(String todoId) => isLoading('editing-$todoId');
-  bool isToggling(String todoId) => isLoading('toggling-$todoId');
+  // Additional state for UI
+  final RxBool isAddingTodo = false.obs;
+  final RxMap<String, bool> operationLoadingStates = <String, bool>{}.obs;
+  final Rx<TodoPriority> selectedPriority = TodoPriority.medium.obs;
+  final Rx<TodoSortOption> currentSortOption = TodoSortOption.dateCreated.obs;
+  final RxBool sortAscending = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    _initializeTodos();
-    _setupSearchListener();
+    initializeTodos();
+    setupSearchListener();
   }
 
   @override
   void onClose() {
     searchController.dispose();
     addTodoController.dispose();
+    addTodoDescriptionController.dispose();
     super.onClose();
   }
 
-  void _setupSearchListener() {
+  void setupSearchListener() {
     searchController.addListener(() {
-      _searchQuery.value = searchController.text;
+      searchQuery.value = searchController.text;
     });
   }
 
-  void _initializeTodos() {
-    _status.value = LoadingState.loading;
+  // Getters
+  List<Todo> get todos => todoList;
 
-    _firestore.collection('todos').snapshots().listen(
+  String get currentSearchQuery => searchQuery.value;
+
+  LoadingState get status => loadingStatus.value;
+
+  bool get isCurrentlyAddingTodo => isAddingTodo.value;
+
+  // Filtered and sorted todos
+  List<Todo> get filteredTodos {
+    // Always create a new list from todoList to avoid reactive issues
+    List<Todo> filteredList = List<Todo>.from(todoList);
+
+    // Apply search filter
+    if (searchQuery.value.isNotEmpty) {
+      final query = searchQuery.value.toLowerCase();
+      filteredList = filteredList
+          .where((todo) =>
+              todo.title.toLowerCase().contains(query) ||
+              todo.description.toLowerCase().contains(query))
+          .toList();
+    }
+
+    // Apply sorting to the copy, never to the original reactive list
+    switch (currentSortOption.value) {
+      case TodoSortOption.dateCreated:
+        filteredList.sort((a, b) => sortAscending.value
+            ? a.createdAt.compareTo(b.createdAt)
+            : b.createdAt.compareTo(a.createdAt));
+        break;
+      case TodoSortOption.priority:
+        filteredList.sort((a, b) => sortAscending.value
+            ? a.priority.value.compareTo(b.priority.value)
+            : b.priority.value.compareTo(a.priority.value));
+        break;
+      case TodoSortOption.title:
+        filteredList.sort((a, b) => sortAscending.value
+            ? a.title.compareTo(b.title)
+            : b.title.compareTo(a.title));
+        break;
+      case TodoSortOption.status:
+        filteredList.sort((a, b) => sortAscending.value
+            ? a.isCompleted.toString().compareTo(b.isCompleted.toString())
+            : b.isCompleted.toString().compareTo(a.isCompleted.toString()));
+        break;
+    }
+
+    return filteredList;
+  }
+
+  // Statistics getters for dashboard
+  int get totalTodos => todoList.length;
+
+  int get completedTodos => todoList.where((todo) => todo.isCompleted).length;
+
+  int get pendingTodos => todoList.where((todo) => !todo.isCompleted).length;
+
+  double get completionPercentage =>
+      totalTodos == 0 ? 0 : (completedTodos / totalTodos) * 100;
+
+  Map<TodoPriority, int> get todosByPriority {
+    final result = <TodoPriority, int>{};
+    for (final priority in TodoPriority.values) {
+      result[priority] =
+          todoList.where((todo) => todo.priority == priority).length;
+    }
+    return result;
+  }
+
+  Map<String, int> get todosCompletedByWeek {
+    final now = DateTime.now();
+    final result = <String, int>{};
+
+    for (int i = 6; i >= 0; i--) {
+      final date = now.subtract(Duration(days: i));
+      final dateKey = '${date.day}/${date.month}';
+      result[dateKey] = todoList
+          .where((todo) =>
+              todo.isCompleted &&
+              todo.updatedAt.day == date.day &&
+              todo.updatedAt.month == date.month)
+          .length;
+    }
+
+    return result;
+  }
+
+  // Loading state helpers
+  bool isOperationLoading(String key) => operationLoadingStates[key] ?? false;
+
+  bool isDeletingTodo(String todoId) => isOperationLoading('deleting-$todoId');
+
+  bool isEditingTodo(String todoId) => isOperationLoading('editing-$todoId');
+
+  bool isTogglingTodo(String todoId) => isOperationLoading('toggling-$todoId');
+
+  void initializeTodos() {
+    loadingStatus.value = LoadingState.loading;
+
+    firestore.collection('todos').snapshots().listen(
       (snapshot) {
-        final todoList = snapshot.docs.map((doc) {
+        final todos = snapshot.docs.where(
+          (element) {
+            // remove data that don't contain field 'title' or 'description'
+            final data = element.data();
+            return data.containsKey('title') && data.containsKey('description');
+          },
+        ).map((doc) {
           return Todo.fromMap(doc.data(), doc.id);
         }).toList();
 
-        // Sort by creation date (newest first)
-        todoList.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-
-        _todos.assignAll(todoList);
-        _status.value = LoadingState.done;
+        todoList.assignAll(todos);
+        loadingStatus.value = LoadingState.done;
       },
       onError: (error) {
-        print('Error fetching todos: $error');
-        _status.value = LoadingState.error;
-        Get.snackbar(
-          'Error',
-          'Failed to fetch todos',
-          backgroundColor: Colors.red.shade100,
-          colorText: Colors.red.shade900,
-        );
+        debugPrint('Error fetching todos: $error');
+        loadingStatus.value = LoadingState.error;
       },
     );
   }
 
-  void addTodo() async {
-    final todoText = addTodoController.text.trim();
+  // Refresh method for pull-to-refresh functionality
+  Future<void> refreshTodos() async {
+    try {
+      loadingStatus.value = LoadingState.loading;
+      
+      // Fetch fresh data from Firestore
+      final snapshot = await firestore.collection('todos').get();
+      final todos = snapshot.docs.where(
+        (element) {
+          // remove data that don't contain field 'title' or 'description'
+          final data = element.data();
+          return data.containsKey('title') && data.containsKey('description');
+        },
+      ).map((doc) {
+        return Todo.fromMap(doc.data(), doc.id);
+      }).toList();
 
-    if (todoText.isEmpty || _isAddingTodo.value) return;
+      todoList.assignAll(todos);
+      loadingStatus.value = LoadingState.done;
+    } catch (error) {
+      debugPrint('Error refreshing todos: $error');
+      loadingStatus.value = LoadingState.error;
+      showErrorSnackbar('Failed to refresh todos');
+    }
+  }
+
+  Future<void> addTodo() async {
+    final title = addTodoController.text.trim();
+    final description = addTodoDescriptionController.text.trim();
+
+    if (title.isEmpty || isAddingTodo.value) return;
 
     // Check for duplicates
-    if (_todos
-        .any((todo) => todo.todo.toLowerCase() == todoText.toLowerCase())) {
+    if (todoList
+        .any((todo) => todo.title.toLowerCase() == title.toLowerCase())) {
       Get.dialog(
         AlertDialog(
           title: const Text('Duplicate Item'),
-          content: Text('A todo with the text "$todoText" already exists.'),
+          content: Text('A todo with the title "$title" already exists.'),
           actions: [
             TextButton(
               onPressed: () => Get.back(),
@@ -114,51 +220,101 @@ class TodoController extends GetxController {
       return;
     }
 
-    _isAddingTodo.value = true;
+    isAddingTodo.value = true;
 
     try {
       final newTodo = Todo(
-        id: _uuid.v4(),
-        todo: todoText,
+        id: uuid.v4(),
+        title: title,
+        description: description,
         isCompleted: false,
         createdAt: DateTime.now(),
+        priority: selectedPriority.value,
       );
 
-      await _firestore.collection('todos').doc(newTodo.id).set(newTodo.toMap());
+      await firestore.collection('todos').doc(newTodo.id).set(newTodo.toMap());
 
-      addTodoController.clear();
-      searchController.clear();
-      _searchQuery.value = '';
-
-      Get.snackbar(
-        'Success',
-        'Todo added successfully',
-        backgroundColor: Colors.green.shade100,
-        colorText: Colors.green.shade900,
-      );
+      clearAddTodoForm();
+      showSuccessSnackbar('Todo created successfully');
     } catch (error) {
-      print('Error adding todo: $error');
-      Get.snackbar(
-        'Error',
-        'Failed to add todo',
-        backgroundColor: Colors.red.shade100,
-        colorText: Colors.red.shade900,
-      );
+      debugPrint('Error creating todo: $error');
+      showErrorSnackbar('Failed to create todo');
     } finally {
-      _isAddingTodo.value = false;
+      isAddingTodo.value = false;
     }
   }
 
-  void deleteTodo(Todo todo) async {
-    final loadingKey = 'deleting-${todo.id}';
+  Future<void> createTodo(
+      String title, String description, TodoPriority priority) async {
+    try {
+      final newTodo = Todo(
+        id: uuid.v4(),
+        title: title,
+        description: description,
+        isCompleted: false,
+        createdAt: DateTime.now(),
+        priority: priority,
+      );
 
-    if (isLoading(loadingKey)) return;
+      await firestore.collection('todos').doc(newTodo.id).set(newTodo.toMap());
+    } catch (error) {
+      debugPrint('Error creating todo: $error');
+      rethrow;
+    }
+  }
+
+  Future<void> updateTodo(Todo todo) async {
+    try {
+      await firestore.collection('todos').doc(todo.id).update(todo.toMap());
+    } catch (error) {
+      debugPrint('Error updating todo: $error');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteTodo(String todoId) async {
+    try {
+      await firestore.collection('todos').doc(todoId).delete();
+    } catch (error) {
+      debugPrint('Error deleting todo: $error');
+      rethrow;
+    }
+  }
+
+  Future<void> toggleTodoCompletion(Todo todo) async {
+    final loadingKey = 'toggling-${todo.id}';
+    if (isOperationLoading(loadingKey)) return;
+
+    operationLoadingStates[loadingKey] = true;
+    update();
+
+    try {
+      final updatedTodo = todo.copyWith(
+        isCompleted: !todo.isCompleted,
+        updatedAt: DateTime.now(),
+      );
+      await updateTodo(updatedTodo);
+
+      final status = updatedTodo.isCompleted ? 'completed' : 'pending';
+      showSuccessSnackbar('Todo marked as $status');
+    } catch (error) {
+      debugPrint('Error toggling todo completion: $error');
+      showErrorSnackbar('Failed to update todo status');
+    } finally {
+      operationLoadingStates.remove(loadingKey);
+      update();
+    }
+  }
+
+  Future<void> deleteTodoWithConfirmation(Todo todo) async {
+    final loadingKey = 'deleting-${todo.id}';
+    if (isOperationLoading(loadingKey)) return;
 
     // Show confirmation dialog
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
         title: const Text('Delete Todo'),
-        content: Text('Are you sure you want to delete "${todo.todo}"?'),
+        content: Text('Are you sure you want to delete "${todo.title}"?'),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
@@ -175,136 +331,59 @@ class TodoController extends GetxController {
 
     if (confirmed != true) return;
 
-    _loadingStates[loadingKey] = true;
+    operationLoadingStates[loadingKey] = true;
     update();
 
     try {
-      await _firestore.collection('todos').doc(todo.id).delete();
-
-      Get.snackbar(
-        'Success',
-        'Todo deleted successfully',
-        backgroundColor: Colors.green.shade100,
-        colorText: Colors.green.shade900,
-      );
+      await deleteTodo(todo.id);
+      showSuccessSnackbar('Todo deleted successfully');
     } catch (error) {
-      print('Error deleting todo: $error');
-      Get.snackbar(
-        'Error',
-        'Failed to delete todo',
-        backgroundColor: Colors.red.shade100,
-        colorText: Colors.red.shade900,
-      );
+      debugPrint('Error deleting todo: $error');
+      showErrorSnackbar('Failed to delete todo');
     } finally {
-      _loadingStates.remove(loadingKey);
+      operationLoadingStates.remove(loadingKey);
       update();
     }
   }
 
-  void updateTodo(Todo todo, String newText) async {
-    final loadingKey = 'editing-${todo.id}';
-
-    if (newText.trim() == todo.todo.trim()) {
-      // No changes, just exit edit mode
-      _exitEditMode(todo);
-      return;
-    }
-
-    if (isLoading(loadingKey)) return;
-
-    _loadingStates[loadingKey] = true;
-    update();
-
-    try {
-      final updatedData = {
-        'todo': newText.trim(),
-        'isCompleted': todo.isCompleted,
-        'createdAt': todo.createdAt.toIso8601String(),
-      };
-
-      await _firestore.collection('todos').doc(todo.id).update(updatedData);
-
-      _exitEditMode(todo);
-
-      Get.snackbar(
-        'Success',
-        'Todo updated successfully',
-        backgroundColor: Colors.green.shade100,
-        colorText: Colors.green.shade900,
-      );
-    } catch (error) {
-      print('Error updating todo: $error');
-      Get.snackbar(
-        'Error',
-        'Failed to update todo',
-        backgroundColor: Colors.red.shade100,
-        colorText: Colors.red.shade900,
-      );
-    } finally {
-      _loadingStates.remove(loadingKey);
-      update();
-    }
-  }
-
-  void toggleComplete(Todo todo) async {
-    final loadingKey = 'toggling-${todo.id}';
-
-    if (isLoading(loadingKey)) return;
-
-    _loadingStates[loadingKey] = true;
-    update();
-
-    try {
-      final updatedData = {
-        'todo': todo.todo,
-        'isCompleted': !todo.isCompleted,
-        'createdAt': todo.createdAt.toIso8601String(),
-      };
-
-      await _firestore.collection('todos').doc(todo.id).update(updatedData);
-    } catch (error) {
-      print('Error toggling todo completion: $error');
-      Get.snackbar(
-        'Error',
-        'Failed to update todo',
-        backgroundColor: Colors.red.shade100,
-        colorText: Colors.red.shade900,
-      );
-    } finally {
-      _loadingStates.remove(loadingKey);
-      update();
-    }
-  }
-
-  void enterEditMode(Todo todo) {
-    final index = _todos.indexWhere((t) => t.id == todo.id);
-    if (index != -1) {
-      _todos[index] = _todos[index].copyWith(
-        status: TodoStatus.editing,
-        draft: todo.todo,
-      );
-    }
-  }
-
-  void _exitEditMode(Todo todo) {
-    final index = _todos.indexWhere((t) => t.id == todo.id);
-    if (index != -1) {
-      _todos[index] = _todos[index].copyWith(
-        status: TodoStatus.viewing,
-        draft: null,
-      );
-    }
-  }
-
-  void updateDraft(Todo todo, String draft) {
-    final index = _todos.indexWhere((t) => t.id == todo.id);
-    if (index != -1) {
-      _todos[index] = _todos[index].copyWith(draft: draft);
+  void setSortOption(TodoSortOption option) {
+    if (currentSortOption.value == option) {
+      // Toggle sort direction if same option is selected
+      sortAscending.value = !sortAscending.value;
+    } else {
+      currentSortOption.value = option;
+      sortAscending.value = false; // Default to descending for new option
     }
   }
 
   void clearSearch() {
     searchController.clear();
-    _searchQuery.value = '';
+    searchQuery.value = '';
+  }
+
+  void clearAddTodoForm() {
+    addTodoController.clear();
+    addTodoDescriptionController.clear();
+    selectedPriority.value = TodoPriority.medium;
+  }
+
+  void showSuccessSnackbar(String message) {
+    Get.snackbar(
+      'Success',
+      message,
+      backgroundColor: Colors.green.shade100,
+      colorText: Colors.green.shade900,
+      duration: const Duration(seconds: 2),
+    );
+  }
+
+  void showErrorSnackbar(String message) {
+    Get.snackbar(
+      'Error',
+      message,
+      backgroundColor: Colors.red.shade100,
+      colorText: Colors.red.shade900,
+      duration: const Duration(seconds: 3),
+    );
   }
 }

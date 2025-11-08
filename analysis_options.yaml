@@ -4,12 +4,12 @@ include: package:flutter_lints/flutter.yaml
 linter:
 
   rules:
-    prefer_const_constructors: true
-    avoid_print: true
-    prefer_const_declarations: true
-    avoid_unnecessary_containers: true
-    prefer_const_literals_to_create_immutables: true
-    sized_box_for_whitespace: true
+    prefer_const_constructors: false
+    avoid_print: false
+    prefer_const_declarations: false
+    avoid_unnecessary_containers: false
+    prefer_const_literals_to_create_immutables: false
+    sized_box_for_whitespace: false
 
     prefer_is_empty: false
     file_names: false

@@ -3,16 +3,18 @@ import 'package:dgc_demo_project/firebase_options.dart';
 import 'package:dgc_demo_project/utils/color.dart';
 import 'package:dgc_demo_project/utils/constant.dart';
 import 'package:dgc_demo_project/utils/font.dart';
-import 'package:dgc_demo_project/views/splash_page.dart';
+import 'package:dgc_demo_project/views/main_navigation_wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -27,7 +29,9 @@ Future<void> main() async {
 
   await GetStorage.init();
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(const MyApp());
 }
@@ -49,7 +53,7 @@ class MyApp extends StatelessWidget {
         }
       },
       child: GetMaterialApp(
-        title: 'Customer Inventory',
+        title: 'Todo Checklist App',
         localizationsDelegates: const [
           ...GlobalMaterialLocalizations.delegates,
           GlobalWidgetsLocalizations.delegate,
@@ -93,7 +97,7 @@ class MyApp extends StatelessWidget {
         themeMode: (storage.read(StorageKey.themeModeKeyName) ?? "") == "Dark"
             ? ThemeMode.dark
             : ThemeMode.light,
-        home: const SplashScreen(),
+        home: const MainNavigationWrapper(),
         builder: (context, child) {
           return MediaQuery(
             data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
