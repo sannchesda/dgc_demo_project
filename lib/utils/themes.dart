@@ -13,7 +13,7 @@ ThemeData primaryThemeData(BuildContext context) {
     fontFamily: AppFonts.primary,
     hintColor: Colors.grey[400],
     appBarTheme: AppBarTheme(
-      color: AppColors.primary,
+      backgroundColor: AppColors.primary,
       elevation: 0,
     ),
     iconTheme: IconThemeData(color: AppColors.icon),

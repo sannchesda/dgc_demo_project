@@ -21,7 +21,7 @@ class AppColors {
 
   static Color get iconSecondary => hexToColor("#8FBFFA");
 
-  static Color get disableBorder => Colors.white.withOpacity(0.5);
+  static Color get disableBorder => Colors.white.withValues(alpha: 0.5);
 
   /// Color Palette
   static Color navyBlue = hexToColor("#0C356A");
@@ -35,34 +35,22 @@ Color hexToColor(String code) {
 }
 
 MaterialColor generateMaterialColor(Color color) {
-  final int red = color.red;
-  final int green = color.green;
-  final int blue = color.blue;
+  final int red = (color.r * 255).round();
+  final int green = (color.g * 255).round();
+  final int blue = (color.b * 255).round();
 
   final Map<int, Color> shades = {
-    50: Color.fromRGBO(red, green, blue, .1),
-    100: Color.fromRGBO(red, green, blue, .2),
-    200: Color.fromRGBO(red, green, blue, .3),
-    300: Color.fromRGBO(red, green, blue, .4),
-    400: Color.fromRGBO(red, green, blue, .5),
-    500: Color.fromRGBO(red, green, blue, .6),
-    600: Color.fromRGBO(red, green, blue, .7),
-    700: Color.fromRGBO(red, green, blue, .8),
-    800: Color.fromRGBO(red, green, blue, .9),
-    900: Color.fromRGBO(red, green, blue, 1),
+    50: Color.fromRGBO(red, green, blue, 0.1),
+    100: Color.fromRGBO(red, green, blue, 0.2),
+    200: Color.fromRGBO(red, green, blue, 0.3),
+    300: Color.fromRGBO(red, green, blue, 0.4),
+    400: Color.fromRGBO(red, green, blue, 0.5),
+    500: Color.fromRGBO(red, green, blue, 0.6),
+    600: Color.fromRGBO(red, green, blue, 0.7),
+    700: Color.fromRGBO(red, green, blue, 0.8),
+    800: Color.fromRGBO(red, green, blue, 0.9),
+    900: Color.fromRGBO(red, green, blue, 1.0),
   };
 
-  return MaterialColor(color.value, shades);
-  // return MaterialColor(color.value, {
-  //   50: tintColor(color, 0.9),
-  //   100: tintColor(color, 0.8),
-  //   200: tintColor(color, 0.6),
-  //   300: tintColor(color, 0.4),
-  //   400: tintColor(color, 0.2),
-  //   500: color,
-  //   600: shadeColor(color, 0.1),
-  //   700: shadeColor(color, 0.2),
-  //   800: shadeColor(color, 0.3),
-  //   900: shadeColor(color, 0.4),
-  // });
+  return MaterialColor(color.toARGB32(), shades);
 }

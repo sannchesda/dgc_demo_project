@@ -37,10 +37,10 @@ class CustomButton extends StatelessWidget {
           padding: padding ??
               const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: backgroundColor ?? theme.primaryColor.withOpacity(0.1),
+            color: backgroundColor ?? theme.primaryColor..withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(borderRadius ?? 8),
             border: Border.all(
-              color: backgroundColor ?? theme.primaryColor.withOpacity(0.2),
+              color: backgroundColor ?? theme.primaryColor..withValues(alpha: 0.2),
               width: 1,
             ),
           ),
