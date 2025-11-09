@@ -10,7 +10,7 @@ flutter pub get
 
 echo
 echo "2. Checking code formatting..."
-flutter format --set-exit-if-changed .
+dart format --set-exit-if-changed .
 
 echo
 echo "3. Running static analysis..."
