@@ -11,10 +11,7 @@ jobs:
   # Code Quality and Testing
   test:
     runs-on: ubuntu-latest
-    name: Test on ${{ matrix.channel }}
-    strategy:
-      matrix:
-        channel: [stable]
+    name: Test on Flutter 3.35.6
     
     steps:
     - name: Checkout code
@@ -23,7 +20,7 @@ jobs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        channel: ${{ matrix.channel }}
+        flutter-version: '3.35.6'
         cache: true
         
     - name: Get Flutter version
@@ -61,7 +58,7 @@ jobs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        channel: '3.35.6'
+        flutter-version: '3.35.6'
         cache: true
         
     - name: Install dependencies
