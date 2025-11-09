@@ -15,7 +15,6 @@ jobs:
     strategy:
       matrix:
         channel: [stable]
-        # You can add more channels like [stable, beta] if needed
     
     steps:
     - name: Checkout code
@@ -76,37 +75,3 @@ jobs:
       with:
         name: release-apk
         path: build/app/outputs/flutter-apk/app-release.apk
-
-  # Build iOS (optional - requires macOS runner)
-  build-ios:
-    runs-on: macos-latest
-    needs: test
-    name: Build iOS
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        channel: stable
-        cache: true
-        
-    - name: Install dependencies
-      run: flutter pub get
-      
-    - name: Build iOS (no codesign)
-      run: flutter build ios --release --no-codesign
-      
-    - name: Archive iOS build
-      run: |
-        cd build/ios/iphoneos
-        tar -czf Runner.app.tar.gz Runner.app
-        
-    - name: Upload iOS artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: ios-build
-        path: build/ios/iphoneos/Runner.app.tar.gz
-
