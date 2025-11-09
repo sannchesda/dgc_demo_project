@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "456785084355",
+    "project_id": "simple-crud-app-b7951",
+    "storage_bucket": "simple-crud-app-b7951.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:456785084355:android:465b8548be4976d5a74776",
+        "android_client_info": {
+          "package_name": "com.atlas.dgc_demo_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHrwqsJq_yovJ7rm3BYkRkzO_lXCuDq8w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
