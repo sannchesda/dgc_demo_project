@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
 
-
 class TodoController extends GetxController {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final Uuid uuid = const Uuid();

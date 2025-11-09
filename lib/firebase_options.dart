@@ -65,5 +65,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'simple-crud-app-b7951.firebasestorage.app',
     iosBundleId: 'com.atlas.dgcDemoProject',
   );
-
 }
