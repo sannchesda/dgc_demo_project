@@ -40,12 +40,8 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
       
-    - name: Run model tests (no Firebase dependency)
-      run: flutter test test/models/ --coverage
-      
-    - name: Run validation tests  
-      run: flutter test test/validation/
-
+    - name: Run tests with coverage
+      run: flutter test test/all_tests.dart --coverage
 
   # Build Android APK
   build-android:

@@ -27,20 +27,11 @@ if %errorlevel% neq 0 (
 
 echo.
 echo 4. Running tests...
-echo    Running model tests (no Firebase dependency)...
-call flutter test test\models\
+call flutter test test/all_tests.dart
 if %errorlevel% neq 0 (
-    echo Model tests failed
+    echo Tests failed
     exit /b 1
 )
-echo    Running validation tests...
-call flutter test test\validation\
-if %errorlevel% neq 0 (
-    echo Validation tests failed
-    exit /b 1
-)
-echo    Note: Skipping Firebase-dependent tests (controller, integration, widget tests)
-echo    To run all tests, you need to mock Firebase first.
 
 echo.
 echo 5. Building APK (Debug Mode)...

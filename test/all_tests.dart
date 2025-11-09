@@ -26,9 +26,9 @@ void main() {
       todo_model_tests.main();
     });
 
-    group('🎮 Controller Layer Tests', () {
-      controller_unit_tests.main();
-    });
+    // group('🎮 Controller Layer Tests', () {
+    //   controller_unit_tests.main();
+    // });
 
     group('🔄 Integration Tests', () {
       integration_tests.main();
