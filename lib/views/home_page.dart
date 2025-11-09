@@ -186,11 +186,12 @@ class _HomePageState extends State<HomePage> {
                       child: ui_states.EmptyState(
                         title: 'No todos yet',
                         subtitle:
-                            'Add your first todo above to get started!\nPull down to refresh.',
+                        'Add your first todo above to get started!\nPull down to refresh.',
                         icon: Icons.checklist,
                         onActionPressed: () {
                           controller.addTodoController.text = '';
                           FocusScope.of(context).requestFocus(FocusNode());
+                          Get.to(() => const AddTodoPage());
                         },
                         actionText: 'Add Todo',
                       ),
@@ -198,6 +199,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 );
               }
+
 
               // No search results
               if (filteredTodos.isEmpty && searchQuery.isNotEmpty) {

@@ -22,22 +22,27 @@ class TodoItem extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       decoration: BoxDecoration(
-        color: getBackgroundColor(),
         borderRadius: BorderRadius.circular(12),
+        // add elevation effect
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          )
+        ],
+        color: Colors.white,
         border: Border(
           left: BorderSide(
             color: getPriorityColor(),
-            width: 4,
+            width: 6,
+          ),
+          right: BorderSide(
+            color: getPriorityColor(),
+            width: 6,
           ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey..withValues(alpha: 0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: ListTile(
         leading: Checkbox(
@@ -67,19 +72,6 @@ class TodoItem extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Color getBackgroundColor() {
-    switch (todo.priority) {
-      case TodoPriority.low:
-        return Colors.green;
-      case TodoPriority.medium:
-        return Colors.orange;
-      case TodoPriority.high:
-        return Colors.red;
-      case TodoPriority.urgent:
-        return Colors.purple;
-    }
   }
 
   Color getPriorityColor() {

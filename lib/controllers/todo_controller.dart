@@ -14,10 +14,9 @@ class TodoController extends GetxController {
   final Rx<LoadingState> loadingStatus = LoadingState.loading.obs;
 
   // Text controllers
-  final TextEditingController searchController = TextEditingController();
-  final TextEditingController addTodoController = TextEditingController();
-  final TextEditingController addTodoDescriptionController =
-      TextEditingController();
+  final searchController = TextEditingController();
+  final addTodoController = TextEditingController();
+  final addTodoDescriptionController = TextEditingController();
 
   // Additional state for UI
   final RxBool isAddingTodo = false.obs;
