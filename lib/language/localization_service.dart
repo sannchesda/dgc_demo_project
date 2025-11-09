@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
-
 class LocalizationService extends Translations {
   // static const locale = Locale('en', 'US');
   static const locale = Locale('km', 'KM');

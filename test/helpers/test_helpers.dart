@@ -100,7 +100,7 @@ class MockData {
 
   static const String emptyString = '';
   static const String whitespaceString = '   ';
-  static const String specialCharacters = '!@#\$%^&*()_+-=[]{}|;:\'\",./<>?`~';
+  static const String specialCharacters = '!@#\$%^&*()_+-=[]{}|;:\'",./<>?`~';
 
   static Todo get sampleTodo => TestHelpers.createSampleTodo(
         id: sampleId,

@@ -1,4 +1,3 @@
-
 import 'package:dgc_demo_project/utils/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -125,7 +124,6 @@ Future<void> requestUserLocationPermission() async {
     return;
   }
 }
-
 
 int getExtendedVersionNumber(String version) {
   List versionCells = version.split('.');

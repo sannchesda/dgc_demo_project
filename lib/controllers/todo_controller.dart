@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dgc_demo_project/models/todo.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uuid/uuid.dart';
 
-import '../models/todo.dart';
 
 class TodoController extends GetxController {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;

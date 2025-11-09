@@ -1,0 +1,22 @@
+version: 2
+updates:
+  # Enable version updates for pub (Dart/Flutter)
+  - package-ecosystem: "pub"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    assignees:
+      - "sannchesda"  # Replace with your GitHub username
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps-dev"
+    
+  # Enable version updates for Gradle (Android)
+  - package-ecosystem: "gradle"
+    directory: "/android"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    assignees:
+      - "sannchesda"  # Replace with your GitHub username
