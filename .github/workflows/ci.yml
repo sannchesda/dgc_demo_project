@@ -82,6 +82,7 @@ jobs:
     - name: Distribute to Firebase
       env:
         GOOGLE_APPLICATION_CREDENTIALS: $GITHUB_WORKSPACE/service-account.json
+        FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
       run: |
         firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
           --app $FIREBASE_APP_ID \
